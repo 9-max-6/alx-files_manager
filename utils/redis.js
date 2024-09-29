@@ -43,6 +43,7 @@ class RedisClient {
       return null;
     }
   }
+
   /**
    *
    * @param {string key} stringKey
@@ -54,7 +55,7 @@ class RedisClient {
       await promisify(this.client.SETEX).bind(this.client)(
         stringKey,
         duration,
-        value
+        value,
       );
     } catch (err) {
       console.error('Error setting key in Redis:', err.toString());
@@ -67,7 +68,7 @@ class RedisClient {
    */
   async del(stringKey) {
     try {
-      await promisify(this.client.DEL).bind(this.client)(key);
+      await promisify(this.client.DEL).bind(this.client)(stringKey);
     } catch (err) {
       console.error('Error deleting key from Redis:', err.toString());
     }
