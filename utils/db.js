@@ -1,5 +1,4 @@
 import { MongoClient } from 'mongodb';
-import 'dotenv/config';
 
 class DBClient {
   constructor() {
@@ -21,13 +20,13 @@ class DBClient {
       .catch((err) => {
         console.error(
           'Error when connecting to MongoDB server:',
-          err.toString(),
+          err.toString()
         );
       });
   }
 
   isAlive() {
-    return this.isOpen; // Now references the correct property
+    return this.isOpen;
   }
 
   async nbUsers() {
@@ -37,9 +36,8 @@ class DBClient {
     }
 
     try {
-      const userCollection = this.db.collection('users');
-      const allUsers = await userCollection.find({}).toArray();
-      return allUsers.length;
+      const userCollection = await this.db.collection('users');
+      return userCollection.countDocuments();
     } catch (e) {
       console.error('Error in nbUsers():', e.toString());
       return 0;
@@ -53,9 +51,8 @@ class DBClient {
     }
 
     try {
-      const fileCollection = this.db.collection('files');
-      const allFiles = await fileCollection.find({}).toArray();
-      return allFiles.length;
+      const fileCollection = await this.db.collection('files');
+      return fileCollection.countDocuments();
     } catch (e) {
       console.error('Error in nbFiles():', e.toString());
       return 0;
