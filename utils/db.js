@@ -82,6 +82,26 @@ class DBClient {
       return 0;
     }
   }
+
+  async addNewUser(email, hashedP) {
+    try {
+      const exists = await this.db
+        .collection('users')
+        .findOne({ email: email });
+
+      if (!exists) {
+        return false;
+      } else {
+        const id = await this.db.collection('users').insertOne({
+          email: email,
+          password: hashedP,
+        });
+        return id;
+      }
+    } catch (e) {
+      console.log('Error when inserting new user:', err.toString());
+    }
+  }
 }
 
 const dbClient = new DBClient();
