@@ -21,7 +21,7 @@ class DBClient {
       .catch((err) => {
         console.error(
           'Error when connecting to MongoDB server:',
-          err.toString()
+          err.toString(),
         );
       });
   }
