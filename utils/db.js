@@ -1,6 +1,14 @@
 import { MongoClient } from 'mongodb';
 
+/**
+ * class DBClient to interface with the application
+ * and the MongoDB server
+ */
 class DBClient {
+  /**
+   * creates the mongoClient and provides a mechanism
+   * for checking when the client is connected.
+   */
   constructor() {
     const HOST = process.env.DB_HOST || 'localhost';
     const PORT = process.env.DB_PORT || '27017';
@@ -25,10 +33,21 @@ class DBClient {
       });
   }
 
+  /**
+   * Means to check if the client is connected.
+   * @returns true when the client is connected
+   * to the server
+   * False when it's not
+   */
   isAlive() {
     return this.isOpen;
   }
 
+  /**
+   * Counts number of documents in a collection
+   * @returns the number of documents in the users
+   * collection
+   */
   async nbUsers() {
     if (!this.isOpen) {
       console.error('Database connection is not open');
@@ -44,6 +63,11 @@ class DBClient {
     }
   }
 
+  /**
+   * Counts number of documents in a collection
+   * @returns the number of documents in the files
+   * collection
+   */
   async nbFiles() {
     if (!this.isOpen) {
       console.error('Database connection is not open');
