@@ -19,7 +19,7 @@ class AuthController {
       }
       const credentials = Buffer.from(
         authorization.split(' ')[1],
-        'base64'
+        'base64',
       ).toString('ascii');
 
       const email = credentials.split(':')[0];

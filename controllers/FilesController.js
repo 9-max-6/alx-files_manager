@@ -1,4 +1,5 @@
 /* eslint-disable consistent-return */
+/* eslint-disable no-unused-vars */
 import { ObjectId } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
