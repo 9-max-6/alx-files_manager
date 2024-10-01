@@ -2,7 +2,7 @@ import dbClient from '../utils/db';
 import { ObjectId } from 'mongodb';
 import redisClient from '../utils/redis';
 
-class FileController {
+class FilesController {
   static postUpload(req, res) {
     const token = req.headers['x-token'];
 
@@ -110,4 +110,4 @@ class FileController {
   }
 }
 
-export default FileController;
+export default FilesController;
