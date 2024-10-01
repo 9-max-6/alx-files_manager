@@ -12,6 +12,11 @@ class AuthController {
   static getConnect(req, res) {
     try {
       const { authorization } = req.headers;
+      if (!authorization) {
+        return res.status(401).json({
+          error: 'Unauthorized',
+        });
+      }
       const credentials = Buffer.from(
         authorization.split(' ')[1],
         'base64'
@@ -62,13 +67,23 @@ class AuthController {
     const token = req.headers['x-token'];
     if (!token) {
       res.status(401);
-      res.json({
+      return res.json({
         error: 'Unauthorized',
       });
     }
 
     (async () => {
-      await redisClient.del(`auth_${token}`);
+      try {
+        const result = await redisClient.del(`auth_${token}`);
+        if (result === 0) {
+          return res.status(401).json({ error: 'Unauthorized' });
+        }
+        return res.status(204).send();
+      } catch (e) {
+        return res.status(500).json({
+          error: 'Internal server error',
+        });
+      }
     })();
   }
 
