@@ -2,7 +2,6 @@ const request = require('request');
 const url = 'http://localhost:5000';
 
 const baseString = 'Basic Ym9iQGR5bGFuLmNvbTp0b3RvMTIzNCE';
-let auth_token = '';
 
 function getAuthToken() {
   return new Promise((resolve, reject) => {
@@ -42,11 +41,9 @@ function checkAuth() {
     console.log(JSON.parse(body));
   });
 
-  let auth_token;
-
   (async () => {
     try {
-      auth_token = await getAuthToken();
+      const auth_token = await getAuthToken();
 
       // right token
       request.get(
@@ -105,7 +102,7 @@ function checkAuth() {
 
 function checkFile() {
   getAuthToken()
-    .then((val) => {})
+    .then((auth_token) => {})
     .catch((e) => {});
 }
 checkAuth();
