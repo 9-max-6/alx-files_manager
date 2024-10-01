@@ -201,10 +201,13 @@ class FilesController {
 
       const page = parseInt(req.query.page, 10) || 0;
       const pageSize = 20;
+      const parentId = req.query.parentId
+        ? new ObjectId(req.query.parentId)
+        : 0;
 
       const pagesToSkip = page * pageSize;
       const files = await dbClient.findFiles(pagesToSkip, pageSize, {
-        parentId: new ObjectId(req.query.parentId),
+        parentId: parentId,
       });
 
       return res.status(200).json({
