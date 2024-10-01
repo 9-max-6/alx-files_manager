@@ -133,6 +133,7 @@ class FilesController {
       });
     })();
   }
+
   static getShow(req, res) {
     const token = req.headers['x-token'];
     if (!token) {
@@ -170,6 +171,7 @@ class FilesController {
       return res.status(200).json({ ...file });
     })();
   }
+
   static getIndex(req, res) {
     const token = req.headers['x-token'];
     if (!token) {
@@ -196,15 +198,15 @@ class FilesController {
         });
       }
 
-      const page = parseInt(req.query.page) || 0;
+      const page = parseInt(req.query.page, 10) || 0;
       const pageSize = 20;
 
       const pagesToSkip = page * pageSize;
       const files = dbClient.findFiles(pagesToSkip, pageSize);
 
       return res.status(200).json({
-        page: page,
-        pageSize: pageSize,
+        page,
+        pageSize,
         items: files,
       });
     })();

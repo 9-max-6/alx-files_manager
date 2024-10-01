@@ -19,7 +19,7 @@ class AuthController {
       }
       const credentials = Buffer.from(
         authorization.split(' ')[1],
-        'base64'
+        'base64',
       ).toString('ascii');
 
       const email = credentials.split(':')[0];
@@ -27,7 +27,7 @@ class AuthController {
 
       try {
         (async () => {
-          const user = await dbClient.findUser({ email: email });
+          const user = await dbClient.findUser({ email });
           if (!user) {
             res.status(401);
             return res.json({
