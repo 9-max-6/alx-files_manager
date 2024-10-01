@@ -202,7 +202,7 @@ class FilesController {
       const pageSize = 20;
 
       const pagesToSkip = page * pageSize;
-      const files = dbClient.findFiles(pagesToSkip, pageSize);
+      const files = await dbClient.findFiles(pagesToSkip, pageSize);
 
       return res.status(200).json({
         page,

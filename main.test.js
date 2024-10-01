@@ -23,7 +23,7 @@ function getAuthToken() {
         } catch (e) {
           console.log(e.toString());
         }
-      },
+      }
     );
   });
 }
@@ -56,7 +56,7 @@ function checkAuth() {
         },
         (err, resp, body) => {
           console.log('getMe:', JSON.parse(body));
-        },
+        }
       );
 
       // wrong token
@@ -69,7 +69,7 @@ function checkAuth() {
         },
         (err, resp, body) => {
           console.log('getMe:', JSON.parse(body));
-        },
+        }
       );
       // disconnect
       request.get(
@@ -89,9 +89,9 @@ function checkAuth() {
             },
             (err, resp, body) => {
               console.log('getMe:', JSON.parse(body));
-            },
+            }
           );
-        },
+        }
       );
 
       console.log(JSON.parse(request.res));
@@ -112,20 +112,19 @@ function makeUser() {
     `${url}/users`,
     {
       body: {
-        email: 'mutukumxaxwel@gmail.com',
-        password: 'max',
+        email: 'mutukumsxaxwel@gmail.com',
       },
       json: true,
     },
     (err, res, body) => {
       console.log(body);
-    },
+    }
   );
 }
 
 function authUser() {
   const baseString = Buffer.from('mutukumaxwel@gmail.com:max').toString(
-    'base64',
+    'base64'
   );
   console.log(baseString);
   request.get(
@@ -138,7 +137,7 @@ function authUser() {
     },
     (err, res, body) => {
       console.log(body);
-    },
+    }
   );
 }
 // authUser();
