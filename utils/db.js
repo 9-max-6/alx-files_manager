@@ -29,7 +29,7 @@ class DBClient {
       .catch((err) => {
         console.error(
           'Error when connecting to MongoDB server:',
-          err.toString(),
+          err.toString()
         );
       });
   }
@@ -147,6 +147,19 @@ class DBClient {
       return false;
     }
   }
+  async findFiles(obj) {
+    try {
+      const file = await this.db.collection('files').findOne(obj);
+
+      if (file) {
+        return file;
+      }
+      return false;
+    } catch (e) {
+      console.log(e);
+      return false;
+    }
+  }
 
   /**
    *
@@ -165,13 +178,13 @@ class DBClient {
     }
   }
 
-  async findFiles(pagesToSkip, pageSize) {
+  async findFiles(pagesToSkip, pageSize, obj) {
     try {
       const files = await this.db
         .collection('files')
-        .find({})
-        .skip(pagesToSkip)
-        .limit(pageSize)
+        .find(obj)
+        .skip(parseInt(pagesToSkip, 10))
+        .limit(parseInt(pageSize, 10))
         .toArray();
 
       return files;

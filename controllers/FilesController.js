@@ -161,6 +161,7 @@ class FilesController {
       }
 
       const file = await dbClient.findFile(req.params.id);
+
       if (!file) {
         return res.status(404).json({
           error: 'Not found',
@@ -202,7 +203,9 @@ class FilesController {
       const pageSize = 20;
 
       const pagesToSkip = page * pageSize;
-      const files = await dbClient.findFiles(pagesToSkip, pageSize);
+      const files = await dbClient.findFiles(pagesToSkip, pageSize, {
+        parentId: new ObjectId(req.query.parentId),
+      });
 
       return res.status(200).json({
         page,
