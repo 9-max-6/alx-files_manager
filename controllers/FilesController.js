@@ -122,31 +122,7 @@ class FilesController {
   }
 
   static getIndex(req, res) {
-    const token = req.headers['x-token'];
-    if (!token) {
-      res.status(401);
-      return res.json({
-        error: 'Unauthorized',
-      });
-    }
-
     (async () => {
-      const userId = await redisClient.get(`auth_${token}`);
-      if (!userId) {
-        res.status(401);
-        return res.json({
-          error: 'Unauthorized',
-        });
-      }
-
-      const user = await dbClient.findUser({ _id: new ObjectId(userId) });
-      if (!user) {
-        res.status(401);
-        return res.json({
-          error: 'Unauthorized',
-        });
-      }
-
       const page = parseInt(req.query.page, 10) || 0;
       const pageSize = 20;
       const parentId = req.query.parentId
@@ -156,7 +132,7 @@ class FilesController {
       const pagesToSkip = page * pageSize;
       const files = await dbClient.findFiles(pagesToSkip, pageSize, {
         parentId,
-        userId: user._id,
+        userId: req.user._id,
       });
 
       return res.status(200).json({

@@ -19,7 +19,7 @@ class AuthController {
       }
       const credentials = Buffer.from(
         authorization.split(' ')[1],
-        'base64',
+        'base64'
       ).toString('ascii');
 
       const email = credentials.split(':')[0];
@@ -85,10 +85,10 @@ class AuthController {
    */
   static getMe(req, res) {
     (async () => {
-      const user = await dbClient.findUser({ _id: new ObjectId(req.user.id) });
+      const user = await dbClient.findUser({ _id: req.user.id });
 
       return res.json({
-        id: user._id,
+        id: user._id.toString(),
         email: user.email,
       });
     })();
