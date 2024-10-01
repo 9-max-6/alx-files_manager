@@ -1,5 +1,5 @@
+/* eslint-disable consistent-return */
 import { MongoClient, ObjectId } from 'mongodb';
-import fs from 'fs';
 
 /**
  * class DBClient to interface with the application
@@ -29,7 +29,7 @@ class DBClient {
       .catch((err) => {
         console.error(
           'Error when connecting to MongoDB server:',
-          err.toString()
+          err.toString(),
         );
       });
   }
@@ -92,20 +92,18 @@ class DBClient {
    */
   async addNewUser(email, hashedP) {
     try {
-      const exists = await this.findUser({ email: email });
+      const exists = await this.findUser({ email });
 
       if (exists) {
-        console.log('Exists', exists);
         return false;
-      } else {
-        const result = await this.db.collection('users').insertOne({
-          email: email,
-          password: hashedP,
-        });
-        return result.insertedId;
       }
+      const result = await this.db.collection('users').insertOne({
+        email,
+        password: hashedP,
+      });
+      return result.insertedId;
     } catch (e) {
-      console.log('Error when inserting new user:', err.toString());
+      console.log('Error when inserting new user:', e.toString());
     }
   }
 
@@ -122,7 +120,9 @@ class DBClient {
         return false;
       }
       return user;
-    } catch (e) {}
+    } catch (e) {
+      console.log('findUser:', e.toString());
+    }
   }
 
   /**
@@ -140,9 +140,8 @@ class DBClient {
 
       if (file) {
         return file;
-      } else {
-        return false;
       }
+      return false;
     } catch (e) {
       console.log(e);
       return false;

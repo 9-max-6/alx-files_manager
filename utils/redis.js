@@ -56,7 +56,7 @@ class RedisClient {
       await promisify(this.client.SETEX).bind(this.client)(
         stringKey,
         duration,
-        value
+        value,
       );
     } catch (err) {
       console.error('Error setting key in Redis:', err.toString());
