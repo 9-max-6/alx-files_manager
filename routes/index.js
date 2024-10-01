@@ -2,6 +2,7 @@ import express from 'express';
 import AppController from '../controllers/AppController';
 import UsersController from '../controllers/UsersController';
 import AuthController from '../controllers/AuthController';
+import FileController from '../controllers/FileController';
 
 const router = express.Router();
 
@@ -30,7 +31,7 @@ router.get('/users/me', (req, res) => {
 });
 
 router.post('/files', (req, res) => {
-  //
+  FileController.postUpload(req, res);
 });
 
 export default router;

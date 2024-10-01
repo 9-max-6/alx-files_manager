@@ -1,4 +1,4 @@
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 import fs from 'fs';
 
 /**
@@ -134,7 +134,9 @@ class DBClient {
    */
   async findFile(id) {
     try {
-      const file = await this.db.collection('files').findOne({ id: id });
+      const file = await this.db
+        .collection('files')
+        .findOne({ _id: new ObjectId(id) });
 
       if (file) {
         return file;
