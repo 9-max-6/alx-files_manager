@@ -19,7 +19,7 @@ class AuthController {
       const credentials = Buffer.from(
         authorization.split(' ')[1],
         'base64'
-      ).toString('ascii');
+      ).toString('utf-8');
 
       const email = credentials.split(':')[0];
       const password = credentials.split(':')[1];
@@ -44,7 +44,7 @@ class AuthController {
 
           // Storing session
           const token = uuidv4();
-          const redisKey = `auth_${token}`;
+          const redisKey = `auth_${token.toString()}`;
           (async () => {
             await redisClient.set(redisKey, user._id.toString(), 86400);
             res.status(200);
