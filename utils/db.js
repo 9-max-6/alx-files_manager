@@ -147,7 +147,7 @@ class DBClient {
       return false;
     }
   }
-  async findFiles(obj) {
+  async findFile(obj) {
     try {
       const file = await this.db.collection('files').findOne(obj);
 
@@ -182,9 +182,11 @@ class DBClient {
     try {
       const files = await this.db
         .collection('files')
-        .find(obj)
-        .skip(parseInt(pagesToSkip, 10))
-        .limit(parseInt(pageSize, 10))
+        .aggregate([
+          { $match: obj },
+          { $skip: pagesToSkip },
+          { $limit: pageSize },
+        ])
         .toArray();
 
       return files;
