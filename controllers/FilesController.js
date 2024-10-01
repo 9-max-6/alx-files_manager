@@ -1,5 +1,7 @@
 import dbClient from '../utils/db';
 import { ObjectId } from 'mongodb';
+import { v4 as uuidv4 } from 'uuid';
+import fs from 'fs';
 import redisClient from '../utils/redis';
 
 class FilesController {
@@ -56,9 +58,10 @@ class FilesController {
         });
       }
 
+      let parent, localPath;
       // interface with mongoClient
       if (req.body.parentId) {
-        const parent = await dbClient.findFile(req.body.parentId);
+        parent = await dbClient.findFile(req.body.parentId);
         if (!parent) {
           res.status(400);
           return res.json({
@@ -74,6 +77,39 @@ class FilesController {
         }
       }
 
+      // write to file
+      if (req.body.type !== 'folder') {
+        const data = Buffer.from(req.body.data, 'base64');
+
+        let rootPath;
+        const rootFolder = process.env.FOLDER_PATH || '/tmp/files_manager';
+        if (parent) {
+          rootPath =
+            rootFolder + '/' + (parent.localPath ? parent.localPath : '');
+        } else {
+          rootPath = rootFolder;
+        }
+
+        try {
+          // if the directory is missing make it
+          if (!fs.existsSync(rootPath)) {
+            fs.mkdirSync(rootPath, { recursive: true });
+          }
+
+          localPath = rootPath + '/' + uuidv4().toString();
+          fs.writeFile(localPath, data, (err) => {
+            if (err) {
+              console.log('Error:', err.toString());
+              res.status(500);
+              return res.json({
+                error: 'Error when writing file',
+              });
+            }
+          });
+        } catch (e) {
+          console.log(e.toString());
+        }
+      }
       // regardless of type
       const fileObject = {
         userId: currentUser._id,
@@ -81,26 +117,12 @@ class FilesController {
         type: req.body.type,
         parentId: req.body.parentId ? req.body.parentId : 0,
         isPublic: req.body.isPublic ? req.body.isPublic : false,
-        localPath: req.body.localPath,
+        localPath: localPath,
       };
 
       // add file
-      const id = await dbClient.addFile(fileObject).insertId;
-
-      // write to file
-      if (!req.body.type === 'folder') {
-        const data = Buffer.from(data, 'base64').toString('utf-8');
-        console.log(data);
-        fs.writeFile(req.body.localPath, data, (err) => {
-          if (err) {
-            res.status(500);
-            return res.json({
-              error: 'Error when writing file',
-            });
-          }
-        });
-      }
-
+      const result = await dbClient.addFile(fileObject);
+      const id = result.insertedId.toString();
       res.status(201);
       return res.json({
         id: id,

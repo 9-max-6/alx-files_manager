@@ -160,13 +160,11 @@ class DBClient {
       if (!result) {
         return false;
       }
-      return true;
+      return result;
     } catch (e) {
       return false;
     }
   }
-
-  async writeFileToFS(obj) {}
 }
 
 const dbClient = new DBClient();
