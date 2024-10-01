@@ -1,6 +1,6 @@
 import express from 'express';
 import AppController from '../controllers/AppController';
-import UserController from '../controllers/UsersController';
+import UsersController from '../controllers/UsersController';
 import AuthController from '../controllers/AuthController';
 
 const router = express.Router();
@@ -14,7 +14,7 @@ router.get('/stats', (req, res) => {
 });
 
 router.post('/users', (req, res) => {
-  UserController.postNew(req, res);
+  UsersController.postNew(req, res);
 });
 
 router.get('/connect', (req, res) => {

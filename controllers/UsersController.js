@@ -11,8 +11,8 @@ class UserController {
    * @param {request object from Node} req
    */
   static postNew(req, res) {
-    const { email } = req.body;
-    const { password } = req.body;
+    const email = req.body.email;
+    const password = req.body.password;
 
     if (!email) {
       res.status(400);
@@ -20,21 +20,20 @@ class UserController {
     }
     if (!password) {
       res.status(400);
-      res.json({ error: 'Missing password' });
+      return res.json({ error: 'Missing password' });
     }
-
     const hashedP = sha1(password);
     (async () => {
       try {
         const id = await dbClient.addNewUser(email, hashedP);
         if (!id) {
           res.status(400);
-          res.json({
+          return res.json({
             error: 'Already exist',
           });
         }
         res.status(201);
-        res.json({
+        return res.json({
           id: id,
           email: email,
         });

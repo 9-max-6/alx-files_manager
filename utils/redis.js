@@ -18,6 +18,7 @@ class RedisClient {
       })
       .on('connect', () => {
         this.isOpen = true;
+        console.log('Connected to Redis server');
       });
   }
 

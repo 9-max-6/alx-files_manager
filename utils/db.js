@@ -92,16 +92,17 @@ class DBClient {
    */
   async addNewUser(email, hashedP) {
     try {
-      const exists = this.findUser(email);
+      const exists = await this.findUser({ email: email });
 
-      if (!exists) {
+      if (exists) {
+        console.log('Exists', exists);
         return false;
       } else {
-        const id = await this.db.collection('users').insertOne({
+        const result = await this.db.collection('users').insertOne({
           email: email,
           password: hashedP,
         });
-        return id;
+        return result.insertedId;
       }
     } catch (e) {
       console.log('Error when inserting new user:', err.toString());
@@ -114,15 +115,13 @@ class DBClient {
    * @returns returns the user who exists
    * otherwise returns false
    */
-  async findUser(email) {
+  async findUser(obj) {
     try {
-      const exists = await this.db
-        .collection('users')
-        .findOne({ email: email });
-      if (!exists) {
+      const user = await this.db.collection('users').findOne(obj);
+      if (!user) {
         return false;
       }
-      return exists;
+      return user;
     } catch (e) {}
   }
 
@@ -155,14 +154,7 @@ class DBClient {
    */
   async addFile(obj) {
     try {
-      const result = await this.db.collection('files').insertOne({
-        userId: obj.id,
-        name: obj.name,
-        type: obj.type,
-        isPublic: obj.isPublic,
-        parentId: obj.parentId ? obj.parentId : 0,
-        localpath: obj.localpath,
-      });
+      const result = await this.db.collection('files').insertOne(obj);
       if (!result) {
         return false;
       }

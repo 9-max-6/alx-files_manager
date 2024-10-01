@@ -12,15 +12,15 @@ class FileController {
     // user
     let currentUser;
     (async () => {
-      const userEmail = await redisClient.get('auth_' + token);
-      if (!userEmail) {
+      const userId = await redisClient.get('auth_' + token);
+      if (!userId) {
         res.status(401);
         res.json({
           error: 'Unauthorized',
         });
       }
 
-      const user = await dbClient.findUser(userEmail);
+      const user = await dbClient.findUser({ id: userId });
       if (!user) {
         res.status(401);
         res.json({
@@ -28,7 +28,7 @@ class FileController {
         });
       }
 
-      //   reference user
+      // reference user
       currentUser = user;
     })();
 
@@ -54,25 +54,56 @@ class FileController {
       });
     }
 
-    // parentId set
-    if (req.params.parentId) {
-      (async () => {
-        const parent = await dbClient.findFile(req.params.parentId);
-        if (!parent) {
-          res.status(400);
-          res.json({
-            error: 'Parent not found',
-          });
-        }
+    // interface with mongClient
+    (async () => {
+      let parent;
 
-        // parent file present
-        if (!parent.isFolder) {
-          res.status(400);
-          res.json({
-            error: 'Parent is not a folder',
-          });
-        }
-      })();
-    }
+      if (req.params.parentId) {
+        parent = await dbClient.findFile(req.params.parentId);
+      }
+      if (!parent) {
+        res.status(400);
+        res.json({
+          error: 'Parent not found',
+        });
+      }
+
+      // parent file not folder
+      if (!parent.isFolder) {
+        res.status(400);
+        res.json({
+          error: 'Parent is not a folder',
+        });
+      }
+
+      // if type is folder
+      const fileObject = {
+        userId: currentUser.id,
+        name: req.params.name,
+        type: req.params.type,
+        parentId: req.params.parentId,
+        isPublic: req.params.isPublic ? req.params.isPublic : false,
+        localPath: req.params.localPath,
+      };
+
+      const id = await dbClient.addFile(fileObject);
+
+      if (req.params.type != 'folder') {
+        const data = Buffer.from(data, 'base64').toString('utf-8');
+        fs.writeFile(req.params.localPath, data, (err) => {
+          if (err) {
+            res.status(500);
+            res.json({
+              error: 'Error when writing file',
+            });
+          }
+        });
+      }
+
+      res.json({
+        id: id,
+        ...fileObject,
+      });
+    })();
   }
 }

@@ -67,6 +67,9 @@ class AuthController {
       await redisClient.del('auth_' + token);
     })();
   }
+  /**
+   * function to retrieve user from the x-token
+   */
   static getMe() {
     const token = req.headers['x-token'];
     if (!token) {
@@ -77,15 +80,15 @@ class AuthController {
     }
 
     (async () => {
-      const userEmail = await redisClient.get('auth_' + token);
-      if (!userEmail) {
+      const userId = await redisClient.get('auth_' + token);
+      if (!userId) {
         res.status(401);
         res.json({
           error: 'Unauthorized',
         });
       }
 
-      const user = await dbClient.findUser(userEmail);
+      const user = await dbClient.findUser({ id: userId });
       if (!user) {
         res.status(401);
         res.json({
