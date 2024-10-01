@@ -1,7 +1,8 @@
-import dbClient from '../utils/db';
+/* eslint-disable consistent-return */
 import { ObjectId } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
+import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
 
 class FilesController {
@@ -17,7 +18,7 @@ class FilesController {
     // user
     let currentUser;
     (async () => {
-      const userId = await redisClient.get('auth_' + token);
+      const userId = await redisClient.get(`auth_${token}`);
       if (!userId) {
         res.status(401);
         return res.json({
@@ -58,7 +59,8 @@ class FilesController {
         });
       }
 
-      let parent, localPath;
+      let parent;
+      let localPath;
       // interface with mongoClient
       if (req.body.parentId) {
         parent = await dbClient.findFile(req.body.parentId);
@@ -84,8 +86,9 @@ class FilesController {
         let rootPath;
         const rootFolder = process.env.FOLDER_PATH || '/tmp/files_manager';
         if (parent) {
-          rootPath =
-            rootFolder + '/' + (parent.localPath ? parent.localPath : '');
+          rootPath = `${rootFolder}/${
+            parent.localPath ? parent.localPath : ''
+          }`;
         } else {
           rootPath = rootFolder;
         }
@@ -96,7 +99,7 @@ class FilesController {
             fs.mkdirSync(rootPath, { recursive: true });
           }
 
-          localPath = rootPath + '/' + uuidv4().toString();
+          localPath = `${rootPath}/${uuidv4().toString()}`;
           fs.writeFile(localPath, data, (err) => {
             if (err) {
               console.log('Error:', err.toString());
@@ -117,7 +120,7 @@ class FilesController {
         type: req.body.type,
         parentId: req.body.parentId ? req.body.parentId : 0,
         isPublic: req.body.isPublic ? req.body.isPublic : false,
-        localPath: localPath,
+        localPath,
       };
 
       // add file
@@ -125,7 +128,7 @@ class FilesController {
       const id = result.insertedId.toString();
       res.status(201);
       return res.json({
-        id: id,
+        id,
         ...fileObject,
       });
     })();

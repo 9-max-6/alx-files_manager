@@ -1,9 +1,9 @@
+/* eslint-disable consistent-return */
 import sha1 from 'sha1';
 import { ObjectId } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 import redisClient from '../utils/redis';
 import dbClient from '../utils/db';
-
 /**
  * Authcontroller to orcherstrate authentication by interfacing
  * with the dbClient and redisClient
@@ -11,10 +11,10 @@ import dbClient from '../utils/db';
 class AuthController {
   static getConnect(req, res) {
     try {
-      const authorization = req.headers['authorization'];
+      const { authorization } = req.headers;
       const credentials = Buffer.from(
         authorization.split(' ')[1],
-        'base64'
+        'base64',
       ).toString('ascii');
 
       const email = credentials.split(':')[0];
@@ -22,7 +22,7 @@ class AuthController {
 
       try {
         (async () => {
-          const user = await dbClient.findUser({ email: email });
+          const user = await dbClient.findUser({ email });
           if (!user) {
             res.status(401);
             return res.json({
@@ -40,12 +40,12 @@ class AuthController {
 
           // Storing session
           const token = uuidv4();
-          const redisKey = 'auth_' + token;
+          const redisKey = `auth_${token}`;
           (async () => {
             await redisClient.set(redisKey, user._id.toString(), 86400);
             res.status(200);
             return res.json({
-              token: token,
+              token,
             });
           })();
         })();
@@ -54,8 +54,10 @@ class AuthController {
       }
     } catch (e) {
       console.log('Error:', e.toString());
+      return res.status(500);
     }
   }
+
   static getDisconnect(req, res) {
     const token = req.headers['x-token'];
     if (!token) {
@@ -66,10 +68,10 @@ class AuthController {
     }
 
     (async () => {
-      await redisClient.del('auth_' + token);
-      return;
+      await redisClient.del(`auth_${token}`);
     })();
   }
+
   /**
    * function to retrieve user from the x-token
    */
@@ -83,7 +85,7 @@ class AuthController {
     }
 
     (async () => {
-      const userId = await redisClient.get('auth_' + token);
+      const userId = await redisClient.get(`auth_${token}`);
       if (!userId) {
         res.status(401);
         return res.json({

@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 import sha1 from 'sha1';
 import dbClient from '../utils/db';
 /**
@@ -11,8 +12,8 @@ class UserController {
    * @param {request object from Node} req
    */
   static postNew(req, res) {
-    const email = req.body.email;
-    const password = req.body.password;
+    const { email } = req.body;
+    const { password } = req.body;
 
     if (!email) {
       res.status(400);
@@ -34,10 +35,12 @@ class UserController {
         }
         res.status(201);
         return res.json({
-          id: id,
-          email: email,
+          id,
+          email,
         });
-      } catch (e) {}
+      } catch (e) {
+        console.log(e.toString());
+      }
     })();
   }
 }

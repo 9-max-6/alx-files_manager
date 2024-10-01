@@ -15,6 +15,7 @@ class AppController {
       db: dbClient.isAlive(),
     });
   }
+
   /**
    *
    * @param {request object} req
@@ -35,6 +36,7 @@ class AppController {
         console.log(err.toString());
       }
     }
+    return res.status(500);
   }
 }
 
