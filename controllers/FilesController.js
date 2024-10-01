@@ -133,6 +133,10 @@ class FilesController {
       });
     })();
   }
+  static getShow(req, res) {
+    //
+  }
+  static getIndex(req, res) {}
 }
 
 export default FilesController;
