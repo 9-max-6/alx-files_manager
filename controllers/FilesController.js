@@ -97,7 +97,7 @@ class FilesController {
         userId: req.user.id.toString(),
         name: req.body.name,
         type: req.body.type,
-        parentId: req.body.parentId ? req.body.parentId : 0,
+        parentId: req.body.parentId ? new ObjectId(req.body.parentId) : 0,
         isPublic: req.body.isPublic ? req.body.isPublic : false,
       });
     })();
