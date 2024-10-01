@@ -54,16 +54,8 @@ class FilesController {
       if (req.body.type !== 'folder') {
         const data = Buffer.from(req.body.data, 'base64');
 
-        let rootPath;
-        const rootFolder = process.env.FOLDER_PATH || '/tmp/files_manager';
-        if (parent) {
-          rootPath = `${rootFolder}/${
-            parent.localPath ? parent.localPath : ''
-          }`;
-        } else {
-          rootPath = rootFolder;
-        }
-
+        const rootPath = process.env.FOLDER_PATH || '/tmp/files_manager';
+        let localPath;
         try {
           // if the directory is missing make it
           if (!fs.existsSync(rootPath)) {
@@ -82,6 +74,9 @@ class FilesController {
           });
         } catch (e) {
           console.log(e.toString());
+          return res.status(500).json({
+            error: 'Internal server error',
+          });
         }
       }
       // regardless of type
