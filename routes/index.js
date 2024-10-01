@@ -14,10 +14,7 @@ router.get('/stats', (req, res) => {
   AppController.getStats(req, res);
 });
 
-router.post('/users', (req, res) => {
-  UsersController.postNew(req, res);
-});
-
+router.post('/users', (req, res) => UsersController.postNew(req, res));
 router.get('/connect', (req, res) => {
   AuthController.getConnect(req, res);
 });

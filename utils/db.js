@@ -147,6 +147,11 @@ class DBClient {
       return false;
     }
   }
+  /**
+   *
+   * @param {DecoratorMetadataObject containing the parameter that is to be used} obj
+   * @returns the file object if one was found else returns false.
+   */
   async findFile(obj) {
     try {
       const file = await this.db.collection('files').findOne(obj);

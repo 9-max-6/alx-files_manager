@@ -7,36 +7,7 @@ import redisClient from '../utils/redis';
 
 class FilesController {
   static postUpload(req, res) {
-    const token = req.headers['x-token'];
-
-    if (!token) {
-      res.status(401);
-      res.json({
-        error: 'Unauthorized',
-      });
-    }
-    // user
-    let currentUser;
     (async () => {
-      const userId = await redisClient.get(`auth_${token}`);
-      if (!userId) {
-        res.status(401);
-        return res.json({
-          error: 'Unauthorized',
-        });
-      }
-
-      const user = await dbClient.findUser({ _id: new ObjectId(userId) });
-      if (!user) {
-        res.status(401);
-        return res.json({
-          error: 'Unauthorized',
-        });
-      }
-
-      // reference user
-      currentUser = user;
-
       // name
       if (!req.body.name) {
         res.status(400).json({
@@ -115,7 +86,7 @@ class FilesController {
       }
       // regardless of type
       const fileObject = {
-        userId: currentUser._id,
+        userId: req.user.id,
         name: req.body.name,
         type: req.body.type,
         parentId: req.body.parentId ? req.body.parentId : 0,
@@ -135,31 +106,7 @@ class FilesController {
   }
 
   static getShow(req, res) {
-    const token = req.headers['x-token'];
-    if (!token) {
-      res.status(401);
-      return res.json({
-        error: 'Unauthorized',
-      });
-    }
-
     (async () => {
-      const userId = await redisClient.get(`auth_${token}`);
-      if (!userId) {
-        res.status(401);
-        return res.json({
-          error: 'Unauthorized',
-        });
-      }
-
-      const user = await dbClient.findUser({ _id: new ObjectId(userId) });
-      if (!user) {
-        res.status(401);
-        return res.json({
-          error: 'Unauthorized',
-        });
-      }
-
       const file = await dbClient.findFile(req.params.id);
 
       if (!file) {
@@ -218,6 +165,8 @@ class FilesController {
       });
     })();
   }
+
+  static getFile(req, res) {}
 }
 
 export default FilesController;

@@ -19,7 +19,7 @@ class AuthController {
       }
       const credentials = Buffer.from(
         authorization.split(' ')[1],
-        'base64',
+        'base64'
       ).toString('ascii');
 
       const email = credentials.split(':')[0];
@@ -65,13 +65,6 @@ class AuthController {
 
   static getDisconnect(req, res) {
     const token = req.headers['x-token'];
-    if (!token) {
-      res.status(401);
-      return res.json({
-        error: 'Unauthorized',
-      });
-    }
-
     (async () => {
       try {
         const result = await redisClient.del(`auth_${token}`);
@@ -91,30 +84,8 @@ class AuthController {
    * function to retrieve user from the x-token
    */
   static getMe(req, res) {
-    const token = req.headers['x-token'];
-    if (!token) {
-      res.status(401);
-      return res.json({
-        error: 'Unauthorized',
-      });
-    }
-
     (async () => {
-      const userId = await redisClient.get(`auth_${token}`);
-      if (!userId) {
-        res.status(401);
-        return res.json({
-          error: 'Unauthorized',
-        });
-      }
-
-      const user = await dbClient.findUser({ _id: new ObjectId(userId) });
-      if (!user) {
-        res.status(401);
-        return res.json({
-          error: 'Unauthorized',
-        });
-      }
+      const user = await dbClient.findUser({ _id: new ObjectId(req.user.id) });
 
       return res.json({
         id: user._id,
