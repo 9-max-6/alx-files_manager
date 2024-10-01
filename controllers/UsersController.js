@@ -17,7 +17,7 @@ class UserController {
 
     if (!email) {
       res.status(400);
-      res.json({ error: 'Missing email' });
+      return res.json({ error: 'Missing email' });
     }
     if (!password) {
       res.status(400);

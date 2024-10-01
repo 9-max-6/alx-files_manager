@@ -27,7 +27,7 @@ class AuthController {
 
       try {
         (async () => {
-          const user = await dbClient.findUser({ email });
+          const user = await dbClient.findUser({ email: email });
           if (!user) {
             res.status(401);
             return res.json({

@@ -1,4 +1,5 @@
 const request = require('request');
+
 const url = 'http://localhost:5000';
 
 const baseString = 'Basic Ym9iQGR5bGFuLmNvbTp0b3RvMTIzNCE';
@@ -6,7 +7,7 @@ const baseString = 'Basic Ym9iQGR5bGFuLmNvbTp0b3RvMTIzNCE';
 function getAuthToken() {
   return new Promise((resolve, reject) => {
     request.get(
-      url + '/connect',
+      `${url}/connect`,
       {
         headers: {
           Authorization: baseString,
@@ -22,19 +23,19 @@ function getAuthToken() {
         } catch (e) {
           console.log(e.toString());
         }
-      }
+      },
     );
   });
 }
 function checkAuth() {
-  request.get(url + '/status', (err, resp, body) => {
+  request.get(`${url}/status`, (err, resp, body) => {
     if (err) {
       console.log(err.toString());
     }
     console.log(JSON.parse(body));
   });
 
-  request.get(url + '/stats', (err, resp, body) => {
+  request.get(`${url}/stats`, (err, resp, body) => {
     if (err) {
       console.log(err.toString());
     }
@@ -47,7 +48,7 @@ function checkAuth() {
 
       // right token
       request.get(
-        url + '/users/me',
+        `${url}/users/me`,
         {
           headers: {
             'X-token': auth_token,
@@ -55,24 +56,24 @@ function checkAuth() {
         },
         (err, resp, body) => {
           console.log('getMe:', JSON.parse(body));
-        }
+        },
       );
 
       // wrong token
       request.get(
-        url + '/users/me',
+        `${url}/users/me`,
         {
           headers: {
-            'X-token': auth_token + 'wrong',
+            'X-token': `${auth_token}wrong`,
           },
         },
         (err, resp, body) => {
           console.log('getMe:', JSON.parse(body));
-        }
+        },
       );
       // disconnect
       request.get(
-        url + '/disconnect',
+        `${url}/disconnect`,
         {
           headers: {
             'X-token': auth_token,
@@ -80,7 +81,7 @@ function checkAuth() {
         },
         () => {
           request.get(
-            url + '/users/me',
+            `${url}/users/me`,
             {
               headers: {
                 'X-token': auth_token,
@@ -88,9 +89,9 @@ function checkAuth() {
             },
             (err, resp, body) => {
               console.log('getMe:', JSON.parse(body));
-            }
+            },
           );
-        }
+        },
       );
 
       console.log(JSON.parse(request.res));
@@ -105,4 +106,40 @@ function checkFile() {
     .then((auth_token) => {})
     .catch((e) => {});
 }
-checkAuth();
+
+function makeUser() {
+  request.post(
+    `${url}/users`,
+    {
+      body: {
+        email: 'mutukumxaxwel@gmail.com',
+        password: 'max',
+      },
+      json: true,
+    },
+    (err, res, body) => {
+      console.log(body);
+    },
+  );
+}
+
+function authUser() {
+  const baseString = Buffer.from('mutukumaxwel@gmail.com:max').toString(
+    'base64',
+  );
+  console.log(baseString);
+  request.get(
+    `${url}/connect`,
+    {
+      headers: {
+        Authorization: `Basic ${baseString}`,
+      },
+      json: true,
+    },
+    (err, res, body) => {
+      console.log(body);
+    },
+  );
+}
+// authUser();
+makeUser();
