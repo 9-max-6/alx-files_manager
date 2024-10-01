@@ -11,7 +11,14 @@ import dbClient from '../utils/db';
 class AuthController {
   static getConnect(req, res) {
     try {
-      const { email, password } = req.user;
+      const { authorization } = req.headers;
+      const credentials = Buffer.from(
+        authorization.split(' ')[1],
+        'base64'
+      ).toString('ascii');
+
+      const email = credentials.split(':')[0];
+      const password = credentials.split(':')[1];
 
       try {
         (async () => {
