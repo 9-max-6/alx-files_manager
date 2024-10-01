@@ -99,7 +99,7 @@ class FilesController {
       res.status(201);
       return res.json({
         id: result.insertedId.toString(),
-        userId: req.user.id,
+        userId: req.user.id.toString(),
         name: req.body.name,
         type: req.body.type,
         parentId: req.body.parentId ? req.body.parentId : 0,
@@ -118,6 +118,11 @@ class FilesController {
         });
       }
 
+      if (file.userId !== req.user.id) {
+        return res.status(404).json({
+          error: 'Not found',
+        });
+      }
       // file found
       return res.status(200).json({ ...file });
     })();
