@@ -103,5 +103,9 @@ function checkAuth() {
   })();
 }
 
-function checkFile() {}
+function checkFile() {
+  getAuthToken()
+    .then((val) => {})
+    .catch((e) => {});
+}
 checkAuth();
