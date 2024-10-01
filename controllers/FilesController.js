@@ -4,7 +4,6 @@ import { ObjectId } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
 import dbClient from '../utils/db';
-import redisClient from '../utils/redis';
 
 class FilesController {
   static postUpload(req, res) {
@@ -97,11 +96,14 @@ class FilesController {
 
       // add file
       const result = await dbClient.addFile(fileObject);
-      const id = result.insertedId.toString();
       res.status(201);
       return res.json({
-        id,
-        ...fileObject,
+        id: result.insertedId.toString(),
+        userId: req.user.id,
+        name: req.body.name,
+        type: req.body.type,
+        parentId: req.body.parentId ? req.body.parentId : 0,
+        isPublic: req.body.isPublic ? req.body.isPublic : false,
       });
     })();
   }
