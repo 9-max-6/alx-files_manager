@@ -134,9 +134,81 @@ class FilesController {
     })();
   }
   static getShow(req, res) {
-    //
+    const token = req.headers['x-token'];
+    if (!token) {
+      res.status(401);
+      return res.json({
+        error: 'Unauthorized',
+      });
+    }
+
+    (async () => {
+      const userId = await redisClient.get(`auth_${token}`);
+      if (!userId) {
+        res.status(401);
+        return res.json({
+          error: 'Unauthorized',
+        });
+      }
+
+      const user = await dbClient.findUser({ _id: new ObjectId(userId) });
+      if (!user) {
+        res.status(401);
+        return res.json({
+          error: 'Unauthorized',
+        });
+      }
+
+      const file = await dbClient.findFile(req.params.id);
+      if (!file) {
+        return res.status(404).json({
+          error: 'Not found',
+        });
+      }
+
+      // file found
+      return res.status(200).json({ ...file });
+    })();
   }
-  static getIndex(req, res) {}
+  static getIndex(req, res) {
+    const token = req.headers['x-token'];
+    if (!token) {
+      res.status(401);
+      return res.json({
+        error: 'Unauthorized',
+      });
+    }
+
+    (async () => {
+      const userId = await redisClient.get(`auth_${token}`);
+      if (!userId) {
+        res.status(401);
+        return res.json({
+          error: 'Unauthorized',
+        });
+      }
+
+      const user = await dbClient.findUser({ _id: new ObjectId(userId) });
+      if (!user) {
+        res.status(401);
+        return res.json({
+          error: 'Unauthorized',
+        });
+      }
+
+      const page = parseInt(req.query.page) || 0;
+      const pageSize = 20;
+
+      const pagesToSkip = page * pageSize;
+      const files = dbClient.findFiles(pagesToSkip, pageSize);
+
+      return res.status(200).json({
+        page: page,
+        pageSize: pageSize,
+        items: files,
+      });
+    })();
+  }
 }
 
 export default FilesController;

@@ -3,7 +3,6 @@ import AppController from '../controllers/AppController';
 import UsersController from '../controllers/UsersController';
 import AuthController from '../controllers/AuthController';
 import FilesController from '../controllers/FilesController';
-import setUser from '../utils/middleWare';
 const router = express.Router();
 
 router.get('/status', (req, res) => {

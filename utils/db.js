@@ -165,6 +165,21 @@ class DBClient {
       return false;
     }
   }
+
+  async findFiles(pagesToSkip, pageSize) {
+    try {
+      const files = await this.db
+        .collection('files')
+        .find({})
+        .skip(pagesToSkip)
+        .limit(pageSize)
+        .toArray();
+
+      return files;
+    } catch (e) {
+      console.log(e.toString());
+    }
+  }
 }
 
 const dbClient = new DBClient();
