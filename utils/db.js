@@ -1,4 +1,5 @@
 import { MongoClient } from 'mongodb';
+import fs from 'fs';
 
 /**
  * class DBClient to interface with the application
@@ -83,11 +84,15 @@ class DBClient {
     }
   }
 
+  /**
+   *
+   * @param {email of the user} email
+   * @param {password of the user after hashing} hashedP
+   * @returns id if the user was added successfully
+   */
   async addNewUser(email, hashedP) {
     try {
-      const exists = await this.db
-        .collection('users')
-        .findOne({ email: email });
+      const exists = this.findUser(email);
 
       if (!exists) {
         return false;
@@ -102,6 +107,72 @@ class DBClient {
       console.log('Error when inserting new user:', err.toString());
     }
   }
+
+  /**
+   *
+   * @param {email of the user to lookup} email
+   * @returns returns the user who exists
+   * otherwise returns false
+   */
+  async findUser(email) {
+    try {
+      const exists = await this.db
+        .collection('users')
+        .findOne({ email: email });
+      if (!exists) {
+        return false;
+      }
+      return exists;
+    } catch (e) {}
+  }
+
+  /**
+   *
+   * @param {the id of the file to find} id
+   * @returns the file as saved in the db else
+   * false when the file is not found or when an error
+   * occurs
+   */
+  async findFile(id) {
+    try {
+      const file = await this.db.collection('files').findOne({ id: id });
+
+      if (file) {
+        return file;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      console.log(e);
+      return false;
+    }
+  }
+
+  /**
+   *
+   * @param {obj containing the details of the file} obj
+   * @returns true if the file was saved successfully
+   */
+  async addFile(obj) {
+    try {
+      const result = await this.db.collection('files').insertOne({
+        userId: obj.id,
+        name: obj.name,
+        type: obj.type,
+        isPublic: obj.isPublic,
+        parentId: obj.parentId ? obj.parentId : 0,
+        localpath: obj.localpath,
+      });
+      if (!result) {
+        return false;
+      }
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  async writeFileToFS(obj) {}
 }
 
 const dbClient = new DBClient();

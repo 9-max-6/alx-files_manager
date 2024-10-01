@@ -10,7 +10,7 @@ class UserController {
    * @param {response object from Node} res
    * @param {request object from Node} req
    */
-  static postNew(res, req) {
+  static postNew(req, res) {
     const { email } = req.body;
     const { password } = req.body;
 
