@@ -26,12 +26,14 @@ const preAuthFlow = async (req, res, next) => {
    * */
   const token = req.headers['x-token'];
   if (!token) {
+    console.log(req.path);
     if (req.path.endsWith('/data')) {
       next();
+      return;
     }
     res.status(401);
     return res.json({
-      error: 'Unauthorized',
+      error: 'Unauthoorized',
     });
   }
 
@@ -40,6 +42,7 @@ const preAuthFlow = async (req, res, next) => {
     if (!userId) {
       if (req.path.endsWith('/data')) {
         next();
+        return;
       }
       res.status(401);
       return res.json({
@@ -51,6 +54,7 @@ const preAuthFlow = async (req, res, next) => {
     if (!user) {
       if (req.path.endsWith('/data')) {
         next();
+        return;
       }
       res.status(401);
       return res.json({
