@@ -8,6 +8,12 @@ import dbClient from '../utils/db';
 import request from 'request';
 
 class FilesController {
+  /**
+   *
+   * @param {request} req
+   * @param {Response} res
+   * @returns file uploaded
+   */
   static async postUpload(req, res) {
     // name
     if (!req.body.name) {
@@ -85,7 +91,7 @@ class FilesController {
       userId: req.user.id,
       name: req.body.name,
       type: req.body.type,
-      parentId: req.body.parentId ? req.body.parentId : 0,
+      parentId: req.body.parentId ? new ObjectId(req.body.parentId) : 0,
       isPublic: req.body.isPublic ? req.body.isPublic : false,
       localPath,
     };
@@ -109,6 +115,7 @@ class FilesController {
       });
     }
   }
+
   /**
    *
    * @param {request} req
@@ -135,13 +142,14 @@ class FilesController {
         userId: file.userId.toString(),
         name: file.name,
         type: file.type,
-        parentId: file.parentId,
+        parentId: file.parentId.toString(),
         isPublic: file.isPublic,
       });
     } catch (e) {
       console.log('Error when finding file:', e.toString());
     }
   }
+
   /**
    *
    * @param {request} req
@@ -161,7 +169,12 @@ class FilesController {
 
     return res.status(200).json(files);
   }
-
+  /**
+   *
+   * @param {request} req
+   * @param {Response} res
+   * @returns published file
+   */
   static async putPublish(req, res) {
     const exists = dbClient.findFile(req.params.id);
     if (!exists) {
@@ -190,7 +203,12 @@ class FilesController {
     const newFile = dbClient.findFile(req.params.id);
     return res.status(200).json({ ...newFile });
   }
-
+  /**
+   *
+   * @param {request} req
+   * @param {Response} res
+   * @returns unpublished file
+   */
   static async putUnpublish(req, res) {
     const exists = dbClient.findFile(req.params.id);
     if (!exists) {

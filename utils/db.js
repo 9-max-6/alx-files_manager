@@ -172,12 +172,12 @@ class DBClient {
    * @returns a list of files that fit the criteria
    * using pagination
    */
-  async findFiles(pagesToSkip, pageSize, obj) {
+  async findFiles(pagesToSkip, pageSize, filter) {
     try {
       const files = await this.db
         .collection('files')
         .aggregate([
-          { $match: obj },
+          { $match: filter },
           { $skip: pagesToSkip },
           { $limit: pageSize },
         ])
