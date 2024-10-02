@@ -6,6 +6,7 @@ import fs from 'fs';
 import { lookup } from 'mime-types';
 import dbClient from '../utils/db';
 import fileQueue from '../worker';
+
 class FilesController {
   /**
    *
