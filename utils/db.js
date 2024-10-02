@@ -182,7 +182,14 @@ class DBClient {
       return false;
     }
   }
-
+  /**
+   *
+   * @param {number of pages to $skip} pagesToSkip
+   * @param {the size of one page} pageSize
+   * @param {the filter criteria} obj
+   * @returns a list of files that fit the criteria
+   * using pagination
+   */
   async findFiles(pagesToSkip, pageSize, obj) {
     try {
       const files = await this.db
@@ -199,7 +206,13 @@ class DBClient {
       console.log(e.toString());
     }
   }
-
+  /**
+   *
+   * @param {filter to apply to find the object} filter
+   * @param {the update to be made} update
+   * @returns true if the operation was successful or
+   * false when the operation is not successful
+   */
   async updateFile(filter, update) {
     try {
       const result = await this.db.updateOne(filter, update);

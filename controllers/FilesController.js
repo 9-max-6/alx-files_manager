@@ -55,7 +55,6 @@ class FilesController {
       const data = Buffer.from(req.body.data, 'base64');
 
       const rootPath = process.env.FOLDER_PATH || '/tmp/files_manager';
-      let localPath;
       try {
         // if the directory is missing make it
         if (!fs.existsSync(rootPath)) {
@@ -79,6 +78,7 @@ class FilesController {
         });
       }
     }
+
     // regardless of type
     const fileObject = {
       userId: req.user.id,
@@ -98,7 +98,7 @@ class FilesController {
         userId: req.user.id.toString(),
         name: req.body.name,
         type: req.body.type,
-        parentId: req.body.parentId ? new ObjectId(req.body.parentId) : 0,
+        parentId: req.body.parentId ? req.body.parentId : 0,
         isPublic: req.body.isPublic ? req.body.isPublic : false,
       });
     } catch (e) {
