@@ -42,7 +42,7 @@ class FilesController {
           });
         }
         // parent file not folder
-        if (!parent.type === 'folder') {
+        if (parent.type !== 'folder') {
           res.status(400);
           return res.json({
             error: 'Parent is not a folder',
