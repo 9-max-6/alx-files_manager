@@ -18,7 +18,7 @@ class AuthController {
       }
       const credentials = Buffer.from(
         authorization.split(' ')[1],
-        'base64',
+        'base64'
       ).toString('utf-8');
 
       const email = credentials.split(':')[0];
@@ -35,7 +35,7 @@ class AuthController {
           }
 
           // Checking email
-          if (!sha1(password) === user.password) {
+          if (sha1(password) !== user.password) {
             res.status(401);
             return res.json({
               error: 'Unauthorized',
