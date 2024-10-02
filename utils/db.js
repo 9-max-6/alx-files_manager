@@ -139,7 +139,6 @@ class DBClient {
         .findOne({ _id: new ObjectId(id) });
 
       if (file) {
-        console.log(file);
         return file;
       }
       return false;

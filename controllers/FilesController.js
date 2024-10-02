@@ -217,7 +217,7 @@ class FilesController {
     }
 
     // checking if the current user is the owner of the file.
-    if (exists.userId !== req.user.id) {
+    if (exists.userId.toString() !== req.user.id.toString()) {
       return res.status(404).json({
         error: 'Not found',
       });
