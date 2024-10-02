@@ -143,25 +143,7 @@ class DBClient {
       }
       return false;
     } catch (e) {
-      console.log(e);
-      return false;
-    }
-  }
-  /**
-   *
-   * @param {DecoratorMetadataObject containing the parameter that is to be used} obj
-   * @returns the file object if one was found else returns false.
-   */
-  async findFile(obj) {
-    try {
-      const file = await this.db.collection('files').findOne(obj);
-
-      if (file) {
-        return file;
-      }
-      return false;
-    } catch (e) {
-      console.log(e);
+      console.log('Error when finding file', e.toString());
       return false;
     }
   }

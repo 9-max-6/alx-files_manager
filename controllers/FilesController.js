@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
 import { lookup } from 'mime-types';
 import dbClient from '../utils/db';
+import request from 'request';
 
 class FilesController {
   static async postUpload(req, res) {
@@ -103,37 +104,50 @@ class FilesController {
       });
     } catch (e) {
       console.log(e.toString());
-      res.status(500).json({
+      return res.status(500).json({
         error: 'Internal server error occurred',
       });
     }
   }
-
+  /**
+   *
+   * @param {request} req
+   * @param {Response} res
+   * @returns file if it exists
+   */
   static async getShow(req, res) {
-    const file = await dbClient.findFile(req.params.id);
+    try {
+      const file = await dbClient.findFile(req.params.id);
+      if (!file) {
+        return res.status(404).json({
+          error: 'Not foound',
+        });
+      }
 
-    if (!file) {
-      return res.status(404).json({
-        error: 'Not found',
+      if (file.userId.toString() !== req.user.id.toString()) {
+        return res.status(404).json({
+          error: 'Not fouund',
+        });
+      }
+      // file found
+      return res.status(200).json({
+        id: file._id.toString(),
+        userId: file.userId.toString(),
+        name: file.name,
+        type: file.type,
+        parentId: file.parentId,
+        isPublic: file.isPublic,
       });
+    } catch (e) {
+      console.log('Error when finding file:', e.toString());
     }
-
-    if (file.userId !== req.user.id) {
-      return res.status(404).json({
-        error: 'Not found',
-      });
-    }
-    // file found
-    return res.status(200).json({
-      id: file._id.toString(),
-      userId: file.userId.toString(),
-      name: file.name,
-      type: file.type,
-      parentId: file.parentId,
-      isPublic: file.isPublic,
-    });
   }
-
+  /**
+   *
+   * @param {request} req
+   * @param {Response} res
+   * @returns paginated results
+   */
   static async getIndex(req, res) {
     const page = parseInt(req.query.page, 10) || 0;
     const pageSize = 20;
