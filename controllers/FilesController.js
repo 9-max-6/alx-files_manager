@@ -24,7 +24,7 @@ class FilesController {
       }
 
       // data
-      if (!req.body.data && !req.body.type === 'folder') {
+      if (!req.body.data && req.body.type !== 'folder') {
         return res.status(400).json({
           error: 'Missing data',
         });
