@@ -15,20 +15,20 @@ router.get('/stats', (req, res) => {
 });
 
 router.post('/users', (req, res) => UsersController.postNew(req, res));
-router.get('/connect', (req, res) => {
-  AuthController.getConnect(req, res);
+router.get('/connect', async (req, res) => {
+  await AuthController.getConnect(req, res);
 });
 
-router.get('/disconnect', (req, res) => {
-  AuthController.getDisconnect(req, res);
+router.get('/disconnect', async (req, res) => {
+  await AuthController.getDisconnect(req, res);
 });
 
-router.get('/users/me', (req, res) => {
-  AuthController.getMe(req, res);
+router.get('/users/me', async (req, res) => {
+  await AuthController.getMe(req, res);
 });
 
-router.post('/files', (req, res) => {
-  FilesController.postUpload(req, res);
+router.post('/files', async (req, res) => {
+  await FilesController.postUpload(req, res);
 });
 
 router.get('/files', (req, res) => {

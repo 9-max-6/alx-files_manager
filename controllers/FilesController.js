@@ -6,89 +6,89 @@ import fs from 'fs';
 import dbClient from '../utils/db';
 
 class FilesController {
-  static postUpload(req, res) {
-    (async () => {
-      // name
-      if (!req.body.name) {
-        res.status(400).json({
-          error: 'Missing name',
+  static async postUpload(req, res) {
+    // name
+    if (!req.body.name) {
+      res.status(400).json({
+        error: 'Missing name',
+      });
+    }
+
+    // type
+    const fileTypes = ['folder', 'file', 'image'];
+    if (!req.body.type || !fileTypes.includes(req.body.type)) {
+      return res.status(400).json({
+        error: 'Missing type',
+      });
+    }
+
+    // data
+    if (!req.body.data && req.body.type !== 'folder') {
+      return res.status(400).json({
+        error: 'Missing data',
+      });
+    }
+
+    let parent;
+    let localPath;
+    // interface with mongoClient
+    if (req.body.parentId) {
+      parent = await dbClient.findFile(req.body.parentId);
+      if (!parent) {
+        res.status(400);
+        return res.json({
+          error: 'Parent not found',
         });
       }
-
-      // type
-      const types = ['folder', 'file', 'image'];
-      if (!req.body.type || !types.includes(req.body.type)) {
-        return res.status(400).json({
-          error: 'Missing type',
+      // parent file not folder
+      if (parent.type !== 'folder') {
+        res.status(400);
+        return res.json({
+          error: 'Parent is not a folder',
         });
       }
+    }
 
-      // data
-      if (!req.body.data && req.body.type !== 'folder') {
-        return res.status(400).json({
-          error: 'Missing data',
-        });
-      }
+    // write to file
+    if (req.body.type !== 'folder') {
+      const data = Buffer.from(req.body.data, 'base64');
 
-      let parent;
+      const rootPath = process.env.FOLDER_PATH || '/tmp/files_manager';
       let localPath;
-      // interface with mongoClient
-      if (req.body.parentId) {
-        parent = await dbClient.findFile(req.body.parentId);
-        if (!parent) {
-          res.status(400);
-          return res.json({
-            error: 'Parent not found',
-          });
+      try {
+        // if the directory is missing make it
+        if (!fs.existsSync(rootPath)) {
+          fs.mkdirSync(rootPath, { recursive: true });
         }
-        // parent file not folder
-        if (parent.type !== 'folder') {
-          res.status(400);
-          return res.json({
-            error: 'Parent is not a folder',
-          });
-        }
-      }
 
-      // write to file
-      if (req.body.type !== 'folder') {
-        const data = Buffer.from(req.body.data, 'base64');
-
-        const rootPath = process.env.FOLDER_PATH || '/tmp/files_manager';
-        let localPath;
-        try {
-          // if the directory is missing make it
-          if (!fs.existsSync(rootPath)) {
-            fs.mkdirSync(rootPath, { recursive: true });
+        localPath = `${rootPath}/${uuidv4().toString()}`;
+        fs.writeFile(localPath, data, (err) => {
+          if (err) {
+            console.log('Error:', err.toString());
+            res.status(500);
+            return res.json({
+              error: 'Error when writing file',
+            });
           }
-
-          localPath = `${rootPath}/${uuidv4().toString()}`;
-          fs.writeFile(localPath, data, (err) => {
-            if (err) {
-              console.log('Error:', err.toString());
-              res.status(500);
-              return res.json({
-                error: 'Error when writing file',
-              });
-            }
-          });
-        } catch (e) {
-          console.log(e.toString());
-          return res.status(500).json({
-            error: 'Internal server error',
-          });
-        }
+        });
+      } catch (e) {
+        console.log(e.toString());
+        return res.status(500).json({
+          error: 'Internal server error',
+        });
       }
-      // regardless of type
-      const fileObject = {
-        userId: req.user.id,
-        name: req.body.name,
-        type: req.body.type,
-        parentId: req.body.parentId ? req.body.parentId : 0,
-        isPublic: req.body.isPublic ? req.body.isPublic : false,
-        localPath,
-      };
+    }
+    // regardless of type
+    const fileObject = {
+      userId: req.user.id,
+      name: req.body.name,
+      type: req.body.type,
+      parentId: req.body.parentId ? req.body.parentId : 0,
+      isPublic: req.body.isPublic ? req.body.isPublic : false,
+      localPath,
+    };
 
+    try {
       // add file
       const result = await dbClient.addFile(fileObject);
       res.status(201);
@@ -100,7 +100,12 @@ class FilesController {
         parentId: req.body.parentId ? new ObjectId(req.body.parentId) : 0,
         isPublic: req.body.isPublic ? req.body.isPublic : false,
       });
-    })();
+    } catch (e) {
+      console.log(e.toString());
+      res.status(500).json({
+        error: 'Internal server error occurred',
+      });
+    }
   }
 
   static getShow(req, res) {
@@ -144,8 +149,6 @@ class FilesController {
       });
     })();
   }
-
-  static getFile(req, res) {}
 }
 
 export default FilesController;
