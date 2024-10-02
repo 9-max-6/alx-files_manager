@@ -29,7 +29,7 @@ class DBClient {
       .catch((err) => {
         console.error(
           'Error when connecting to MongoDB server:',
-          err.toString()
+          err.toString(),
         );
       });
   }
@@ -164,6 +164,7 @@ class DBClient {
       return false;
     }
   }
+
   /**
    *
    * @param {number of pages to $skip} pagesToSkip
@@ -204,6 +205,7 @@ class DBClient {
       console.log(e.toString());
     }
   }
+
   /**
    *
    * @param {filter to apply to find the object} filter

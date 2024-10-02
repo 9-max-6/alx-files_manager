@@ -1,5 +1,6 @@
-import redisClient from './redis';
+/* eslint-disable consistent-return */
 import { ObjectId } from 'mongodb';
+import redisClient from './redis';
 import dbClient from './db';
 
 const XMPTED = ['/status', '/stats', '/connect', '/users'];
