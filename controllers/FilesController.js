@@ -5,7 +5,6 @@ import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
 import { lookup } from 'mime-types';
 import dbClient from '../utils/db';
-import request from 'request';
 
 class FilesController {
   /**
@@ -176,7 +175,7 @@ class FilesController {
    * @returns published file
    */
   static async putPublish(req, res) {
-    const exists = dbClient.findFile(req.params.id);
+    const exists = await dbClient.findFile(req.params.id);
     if (!exists) {
       return res.status(404).json({
         error: 'Not found',
@@ -184,7 +183,7 @@ class FilesController {
     }
 
     // checking if the current user is the owner of the file.
-    if (exists.userId !== req.user.id) {
+    if (exists.userId.toString() !== req.user.id.toString()) {
       return res.status(404).json({
         error: 'Not found',
       });
@@ -200,7 +199,7 @@ class FilesController {
     }
     // file properties successfully set, heading back
     // retrieving new file
-    const newFile = dbClient.findFile(req.params.id);
+    const newFile = await dbClient.findFile(req.params.id);
     return res.status(200).json({ ...newFile });
   }
   /**
@@ -210,7 +209,7 @@ class FilesController {
    * @returns unpublished file
    */
   static async putUnpublish(req, res) {
-    const exists = dbClient.findFile(req.params.id);
+    const exists = await dbClient.findFile(req.params.id);
     if (!exists) {
       return res.status(404).json({
         error: 'Not found',
@@ -234,7 +233,7 @@ class FilesController {
     }
     // file properties successfully set, heading back
     // retrieving new file
-    const newFile = dbClient.findFile(req.params.id);
+    const newFile = await dbClient.findFile(req.params.id);
     return res.status(200).json({ ...newFile });
   }
 

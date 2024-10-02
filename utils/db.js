@@ -139,6 +139,7 @@ class DBClient {
         .findOne({ _id: new ObjectId(id) });
 
       if (file) {
+        console.log(file);
         return file;
       }
       return false;
@@ -197,7 +198,9 @@ class DBClient {
    */
   async updateFile(filter, update) {
     try {
-      const result = await this.db.updateOne(filter, update);
+      const result = await this.db
+        .collection('files')
+        .updateOne(filter, update);
       if (!result) {
         return false;
       }
