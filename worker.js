@@ -33,15 +33,19 @@ fileQueue.process(async (job, done) => {
     const thumbnail100 = await imageThumbnail(stream, {
       width: 100,
     });
-    const thumbnail500 = await imageThumbnail(stream, {
+
+    const stream1 = createReadStream(result.localPath);
+    const thumbnail500 = await imageThumbnail(stream1, {
       width: 500,
     });
-    const thumbnail250 = await imageThumbnail(stream, {
+
+    const stream2 = createReadStream(result.localPath);
+    const thumbnail250 = await imageThumbnail(stream2, {
       width: 250,
     });
     job.progress(50);
 
-    const rootPath = result.locaPath.trim(result._id.toString());
+    const rootPath = result.localPath.trim(result._id.toString());
 
     // saving the thumbnails to file
     const absolutePath = rootPath + '100';
@@ -77,8 +81,8 @@ fileQueue.process(async (job, done) => {
   }
 });
 
-fileQueue.on('completed', (job, result) => {
-  console.log(`Job ${job.id} completed! Result:`, result);
+fileQueue.on('completed', (job) => {
+  console.log(`Job ${job.id} completed!:`);
 });
 
 fileQueue.on('failed', (job, err) => {

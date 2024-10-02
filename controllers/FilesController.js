@@ -256,7 +256,11 @@ class FilesController {
    */
   static async getFile(req, res) {
     const fileId = req.params.id;
-
+    // check if the request has the query for size
+    let isThumbnail = false;
+    if (req.query.size) {
+      isThumbnail = true;
+    }
     // attempt to find the file
     const result = await dbClient.findFile(fileId);
     if (!result) {
@@ -299,7 +303,14 @@ class FilesController {
     }
 
     // checking if the file exists locally
-    if (!fs.existsSync(result.localPath)) {
+    let pathLocal;
+    if (isThumbnail) {
+      pathLocal = result.localPath + req.query.size;
+    } else {
+      pathLocal = result.localPath;
+    }
+
+    if (!fs.existsSync(pathLocal)) {
       // if file doesn' exists return 404
       return res.status(404).json({
         error: 'Not found',
@@ -317,7 +328,7 @@ class FilesController {
 
     // reading the file
     try {
-      const fileStream = fs.createReadStream(result.localPath);
+      const fileStream = fs.createReadStream(pathLocal);
       fileStream.pipe(res);
     } catch (e) {
       console.log('Error when reading file.', e.toString());
