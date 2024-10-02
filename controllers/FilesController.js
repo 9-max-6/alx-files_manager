@@ -108,46 +108,47 @@ class FilesController {
     }
   }
 
-  static getShow(req, res) {
-    (async () => {
-      const file = await dbClient.findFile(req.params.id);
+  static async getShow(req, res) {
+    const file = await dbClient.findFile(req.params.id);
 
-      if (!file) {
-        return res.status(404).json({
-          error: 'Not found',
-        });
-      }
+    if (!file) {
+      return res.status(404).json({
+        error: 'Not found',
+      });
+    }
 
-      if (file.userId !== req.user.id) {
-        return res.status(404).json({
-          error: 'Not found',
-        });
-      }
-      // file found
-      return res.status(200).json({ ...file });
-    })();
+    if (file.userId !== req.user.id) {
+      return res.status(404).json({
+        error: 'Not found',
+      });
+    }
+    // file found
+    return res.status(200).json({
+      id: file._id.toString(),
+      userId: file.userId.toString(),
+      name: file.name,
+      type: file.type,
+      parentId: file.parentId,
+      isPublic: file.isPublic,
+    });
   }
 
-  static getIndex(req, res) {
-    (async () => {
-      const page = parseInt(req.query.page, 10) || 0;
-      const pageSize = 20;
-      const parentId = req.query.parentId
-        ? new ObjectId(req.query.parentId)
-        : 0;
+  static async getIndex(req, res) {
+    const page = parseInt(req.query.page, 10) || 0;
+    const pageSize = 20;
+    const parentId = req.query.parentId ? new ObjectId(req.query.parentId) : 0;
 
-      const pagesToSkip = page * pageSize;
-      const files = await dbClient.findFiles(pagesToSkip, pageSize, {
-        parentId,
-        userId: req.user._id,
-      });
+    const pagesToSkip = page * pageSize;
+    const files = await dbClient.findFiles(pagesToSkip, pageSize, {
+      parentId,
+      userId: req.user._id,
+    });
 
-      return res.status(200).json({
-        page,
-        pageSize,
-        items: files,
-      });
-    })();
+    return res.status(200).json(files);
+  }
+
+  static async putPublish(req, res) {
+    const fileId = new ObjectId(req.params.id);
   }
 }
 

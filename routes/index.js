@@ -31,14 +31,14 @@ router.post('/files', async (req, res) => {
   await FilesController.postUpload(req, res);
 });
 
-router.get('/files', (req, res) => {
-  FilesController.getIndex(req, res);
+router.get('/files', async (req, res) => {
+  await FilesController.getIndex(req, res);
 });
-router.get('/files/:id', (req, res) => {
-  FilesController.getShow(req, res);
+router.get('/files/:id', async (req, res) => {
+  await FilesController.getShow(req, res);
 });
-router.put('/files/:id/publish', (req, res) => {
-  FilesController.putPublish(req, res);
+router.put('/files/:id/publish', async (req, res) => {
+  await FilesController.putPublish(req, res);
 });
 router.put('/files/:id/unpublish', (req, res) => {
   FilesController.putUnpublish(req, res);
