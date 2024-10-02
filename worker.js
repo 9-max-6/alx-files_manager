@@ -1,7 +1,7 @@
 import Queue from 'bull';
 import dbClient from './utils/db';
 import { createReadStream, writeFile } from 'fs';
-import { imageThumbnail } from 'image-thumbnail';
+import imageThumbnail from 'image-thumbnail';
 
 const fileQueue = new Queue('fileQueue');
 
@@ -29,9 +29,9 @@ fileQueue.process(async (job, done) => {
 
   //   retrieve the contents of the file
   try {
-    const stream = createReadStream(result.locaPath);
+    const stream = createReadStream(result.localPath);
     const thumbnail100 = await imageThumbnail(stream, {
-      width: 2100,
+      width: 100,
     });
     const thumbnail500 = await imageThumbnail(stream, {
       width: 500,
@@ -72,7 +72,21 @@ fileQueue.process(async (job, done) => {
 
     // complete the job
     done();
-  } catch (e) {}
+  } catch (e) {
+    console.log(e.toString());
+  }
+});
+
+fileQueue.on('completed', (job, result) => {
+  console.log(`Job ${job.id} completed! Result:`, result);
+});
+
+fileQueue.on('failed', (job, err) => {
+  console.error(`Job ${job.id} failed! Error:`, err);
+});
+
+fileQueue.on('progress', (job, progress) => {
+  console.log(`Job ${job.id} progress:`, progress);
 });
 
 export default fileQueue;

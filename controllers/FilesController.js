@@ -105,24 +105,8 @@ class FilesController {
           userId: req.user.id,
           fileId: result.insertedId.toString(),
         };
-        fileQueue.add(jobData).then((job) => {
-          // Register event handler for when the job is completed
-          job.on('completed', (result) => {
-            console.log(`Job ${job.id} completed! Result:`, result);
-          });
-
-          // Register event handler for when the job fails
-          job.on('failed', (err) => {
-            console.error(`Job ${job.id} failed! Error:`, err);
-          });
-
-          // Register event handler for progress updates
-          job.on('progress', (progress) => {
-            console.log(`Job ${job.id} progress:`, progress);
-          });
-        });
+        fileQueue.add(jobData);
       }
-
       // send response
       res.status(201);
       return res.json({
