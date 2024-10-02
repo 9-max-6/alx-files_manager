@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
 import { lookup } from 'mime-types';
 import dbClient from '../utils/db';
-
+import fileQueue from '../worker';
 class FilesController {
   /**
    *
@@ -98,6 +98,32 @@ class FilesController {
     try {
       // add file
       const result = await dbClient.addFile(fileObject);
+
+      // check if the file is an image and make add it to the queue
+      if (req.body.type === 'image') {
+        const jobData = {
+          userId: req.user.id,
+          fileId: result.insertedId.toString(),
+        };
+        fileQueue.add(jobData).then((job) => {
+          // Register event handler for when the job is completed
+          job.on('completed', (result) => {
+            console.log(`Job ${job.id} completed! Result:`, result);
+          });
+
+          // Register event handler for when the job fails
+          job.on('failed', (err) => {
+            console.error(`Job ${job.id} failed! Error:`, err);
+          });
+
+          // Register event handler for progress updates
+          job.on('progress', (progress) => {
+            console.log(`Job ${job.id} progress:`, progress);
+          });
+        });
+      }
+
+      // send response
       res.status(201);
       return res.json({
         id: result.insertedId.toString(),
