@@ -1,5 +1,6 @@
 import Queue from 'bull';
 import dbClient from './utils/db';
+import { ObjectId } from 'mongodb';
 import { createReadStream, writeFile } from 'fs';
 import imageThumbnail from 'image-thumbnail';
 
@@ -93,4 +94,27 @@ fileQueue.on('progress', (job, progress) => {
   console.log(`Job ${job.id} progress:`, progress);
 });
 
-export default fileQueue;
+const userQueue = new Queue('userQueue');
+userQueue.process(async (job, done) => {
+  const userId = job.data.userId;
+  // check for the userId in the job data
+  if (!userId) {
+    done(new Error('Missing userId'));
+  }
+  const user = await dbClient.findUser({
+    _id: new ObjectId(userId),
+  });
+  //   if no user found
+  if (!user) {
+    done(new Error('Missing userId'));
+  }
+  //   welcome user
+  console.log('Welcome', user.email);
+  done();
+});
+
+userQueue.on('progress', (job, progress) => {
+  console.log(`Job ${job.id} progress:`, progress);
+});
+
+export { fileQueue, userQueue };

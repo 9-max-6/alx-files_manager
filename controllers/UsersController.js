@@ -1,6 +1,8 @@
 /* eslint-disable consistent-return */
 import sha1 from 'sha1';
 import dbClient from '../utils/db';
+import { userQueue } from '../worker';
+
 /**
  * UserController class to access and retrieve
  * users from storage
@@ -34,6 +36,11 @@ class UserController {
           });
         }
         res.status(201);
+
+        // add a job to the queue
+        const jobData = { userId: id.toString() };
+        userQueue.add(jobData);
+
         return res.json({
           id,
           email,
