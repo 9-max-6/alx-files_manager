@@ -176,7 +176,7 @@ class FilesController {
     return res.status(200).json({ ...newFile });
   }
 
-  static async putUnpublush(req, res) {
+  static async putUnpublish(req, res) {
     const exists = dbClient.findFile(req.params.id);
     if (!exists) {
       return res.status(404).json({
@@ -203,6 +203,10 @@ class FilesController {
     // retrieving new file
     const newFile = dbClient.findFile(req.params.id);
     return res.status(200).json({ ...newFile });
+  }
+
+  static async getFile(req, res) {
+    const fileId = req.params.id;
   }
 }
 
