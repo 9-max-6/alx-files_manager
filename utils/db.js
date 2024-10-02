@@ -183,7 +183,23 @@ class DBClient {
         ])
         .toArray();
 
-      return files;
+      if (!files) {
+        return [];
+      }
+
+      const returnValue = [];
+      for (const file of files) {
+        returnValue.push({
+          id: file._id.toString(),
+          userId: file.userId.toString(),
+          parentId: file.parentId ? file.parentId.toString() : 0,
+          name: file.name,
+          type: file.type,
+          isPublic: file.isPublic,
+        });
+      }
+
+      return returnValue;
     } catch (e) {
       console.log(e.toString());
     }

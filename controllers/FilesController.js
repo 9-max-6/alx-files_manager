@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
 import { lookup } from 'mime-types';
 import dbClient from '../utils/db';
+import request from 'request';
 
 class FilesController {
   /**
@@ -165,7 +166,6 @@ class FilesController {
       parentId,
       userId: req.user.id,
     });
-
     return res.status(200).json(files);
   }
   /**
@@ -237,6 +237,12 @@ class FilesController {
     return res.status(200).json({ ...newFile });
   }
 
+  /**
+   *
+   * @param {request} req
+   * @param {Response} res
+   * @returns returns file data
+   */
   static async getFile(req, res) {
     const fileId = req.params.id;
 
