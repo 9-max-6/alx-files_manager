@@ -247,7 +247,7 @@ class FilesController {
     const fileId = req.params.id;
 
     // attempt to find the file
-    const result = dbClient.findFile(fileId);
+    const result = await dbClient.findFile(fileId);
     if (!result) {
       return res.status(404).json({
         error: 'Not found',
@@ -263,9 +263,10 @@ class FilesController {
           error: 'Not found',
         });
       }
-
+      // console.log(typeof req.user.id); -> object
+      // console.log(typeof result.userId); -> object
       // check if the authenticated user is the owner of the file.
-      if (result.userId !== req.user.id) {
+      if (result.userId.toString() !== req.user.id.toString()) {
         // not found error since the file is not public and the current
         // user is not owner
         return res.status(404).json({
