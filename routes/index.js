@@ -43,4 +43,8 @@ router.put('/files/:id/publish', async (req, res) => {
 router.put('/files/:id/unpublish', async (req, res) => {
   await FilesController.putUnpublish(req, res);
 });
+
+router.get('/files/:id/data', async (req, res) => [
+  await FilesController.getFile(req, res),
+]);
 export default router;

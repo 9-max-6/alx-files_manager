@@ -26,6 +26,9 @@ const preAuthFlow = async (req, res, next) => {
    * */
   const token = req.headers['x-token'];
   if (!token) {
+    if (req.path.endsWith('/data')) {
+      next();
+    }
     res.status(401);
     return res.json({
       error: 'Unauthorized',
@@ -35,6 +38,9 @@ const preAuthFlow = async (req, res, next) => {
   (async () => {
     const userId = await redisClient.get(`auth_${token}`);
     if (!userId) {
+      if (req.path.endsWith('/data')) {
+        next();
+      }
       res.status(401);
       return res.json({
         error: 'Unauthorized',
@@ -43,6 +49,9 @@ const preAuthFlow = async (req, res, next) => {
 
     const user = await dbClient.findUser({ _id: new ObjectId(userId) });
     if (!user) {
+      if (req.path.endsWith('/data')) {
+        next();
+      }
       res.status(401);
       return res.json({
         error: 'Unauthorized',

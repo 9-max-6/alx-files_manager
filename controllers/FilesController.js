@@ -3,6 +3,7 @@
 import { ObjectId } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
+import { lookup } from 'mime-types';
 import dbClient from '../utils/db';
 
 class FilesController {
@@ -141,7 +142,7 @@ class FilesController {
     const pagesToSkip = page * pageSize;
     const files = await dbClient.findFiles(pagesToSkip, pageSize, {
       parentId,
-      userId: req.user._id,
+      userId: req.user.id,
     });
 
     return res.status(200).json(files);
@@ -207,6 +208,71 @@ class FilesController {
 
   static async getFile(req, res) {
     const fileId = req.params.id;
+
+    // attempt to find the file
+    const result = dbClient.findFile(fileId);
+    if (!result) {
+      return res.status(404).json({
+        error: 'Not found',
+      });
+    }
+
+    // check if the file isPublic
+    if (!result.isPublic) {
+      // check if the user is authenticated
+      if (!req.user) {
+        // if not authenticated return the response
+        return res.status(404).json({
+          error: 'Not found',
+        });
+      }
+
+      // check if the authenticated user is the owner of the file.
+      if (result.userId !== req.user.id) {
+        // not found error since the file is not public and the current
+        // user is not owner
+        return res.status(404).json({
+          error: 'Not found',
+        });
+      }
+    }
+
+    /**
+     * at this point the current user is either the owner of the file
+     * or the file ispublic and so everyone has access to it.
+     */
+
+    // checking the file type
+    if (result.type === 'folder') {
+      return res.status(400).json({
+        error: "A folder doesn't have a type",
+      });
+    }
+
+    // checking if the file exists locally
+    if (!fs.existsSync(result.localPath)) {
+      // if file doesn' exists return 404
+      return res.status(404).json({
+        error: 'Not found',
+      });
+    }
+
+    /**
+     * if the file exists, use the mime-types module to generate
+     * a response to the client.
+     */
+    const mimeType = lookup(result.name);
+    if (mimeType) {
+      res.setHeader('Content-Type', mimeType);
+    }
+
+    // reading the file
+    try {
+      const fileStream = fs.createReadStream(result.localPath);
+      fileStream.pipe(res);
+    } catch (e) {
+      console.log('Error when reading file.', e.toString());
+    }
   }
 }
 
