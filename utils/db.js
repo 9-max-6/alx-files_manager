@@ -199,6 +199,19 @@ class DBClient {
       console.log(e.toString());
     }
   }
+
+  async updateFile(filter, update) {
+    try {
+      const result = await this.db.updateOne(filter, update);
+      if (!result) {
+        return false;
+      }
+      return true;
+    } catch (e) {
+      console.log('Error when updating value in DB:', e.toString());
+      return false;
+    }
+  }
 }
 
 const dbClient = new DBClient();

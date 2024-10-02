@@ -148,7 +148,61 @@ class FilesController {
   }
 
   static async putPublish(req, res) {
-    const fileId = new ObjectId(req.params.id);
+    const exists = dbClient.findFile(req.params.id);
+    if (!exists) {
+      return res.status(404).json({
+        error: 'Not found',
+      });
+    }
+
+    // checking if the current user is the owner of the file.
+    if (exists.userId !== req.user.id) {
+      return res.status(404).json({
+        error: 'Not found',
+      });
+    }
+    // file is present so attempting to update value in db.
+    const filter = { _id: new ObjectId(req.params.id) };
+    const update = { $set: { isPublic: true } };
+    const result = await dbClient.updateFile(filter, update);
+    if (!result) {
+      return res.status(500).json({
+        error: 'Internal server error occurred.',
+      });
+    }
+    // file properties successfully set, heading back
+    // retrieving new file
+    const newFile = dbClient.findFile(req.params.id);
+    return res.status(200).json({ ...newFile });
+  }
+
+  static async putUnpublush(req, res) {
+    const exists = dbClient.findFile(req.params.id);
+    if (!exists) {
+      return res.status(404).json({
+        error: 'Not found',
+      });
+    }
+
+    // checking if the current user is the owner of the file.
+    if (exists.userId !== req.user.id) {
+      return res.status(404).json({
+        error: 'Not found',
+      });
+    }
+    // file is present so attempting to update value in db.
+    const filter = { _id: new ObjectId(req.params.id) };
+    const update = { $set: { isPublic: false } };
+    const result = await dbClient.updateFile(filter, update);
+    if (!result) {
+      return res.status(500).json({
+        error: 'Internal server error occurred.',
+      });
+    }
+    // file properties successfully set, heading back
+    // retrieving new file
+    const newFile = dbClient.findFile(req.params.id);
+    return res.status(200).json({ ...newFile });
   }
 }
 
